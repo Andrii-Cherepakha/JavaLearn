@@ -1,7 +1,5 @@
 package com.acherepakha.elevatorsystem.models;
 
-import java.time.LocalDateTime;
-
 // Should implement java.lang.Comparable to use with Queue ?
 public class Request {
     private final Direction direction;
