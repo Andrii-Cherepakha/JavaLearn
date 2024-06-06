@@ -1,0 +1,53 @@
+Elevator problem
+
+Questions:
+1. How many elevators?
+2. How many buttons - one, two (UP/DOWN), all floors?
+3. Limitation by person/weight?
+
+initial request - a person pressed UP/DOWN button on some floor
+destination request - the person entered the elevator and pressed a number
+
+1. Simple Elevator
+
+The requests are processed one by one: initial request, destination request, and so on.
+
+OPTIMIZATION QUESTIONS
+
+1) Should we ignore DOWN/UP initial requests while moving UP/DOWN?
+
+YES.
+
+2) Should we ignore new UP/DOWN initial requests while moving UP/DOWN?
+
+The elevator is on 1st floor. There is a UP-1 request on 5th floor. While the elevator is moving, a new UP-2 request comes on 3d floor.
+Should the elevator stop to pick up it?
+If UP-1 and UP-2 are not overlapped (like UP-1 from 5th to 7th and UP-2 from 3d to 6th), we are good.
+If UP-1 and UP-2 are overlapped (a new UP request comes with higher destination), there is a problem.
+
+PROBLEM: While a new UP requests are coming, the elevator will always go UP till the end of the building.
+What if meanwhile a DOWN request comes? It will not be processed until all UP requests are done (or the last floor is reached).
+But that DOWN request came _before_ (in timeline) some UP requests.
+So what is the priority of the requests processing? a) going the same direction or b) time?
+SOLUTION: Introduce a counter of the same direction request. Do not pick them up if it exceeded the threshold.
+
+PROBLEM: What if the DOWN request comes (after the threshold) from a higher floor, and the elevator still can process some UP requests
+while moving to pick up the DOWN request?
+
+SOLUTION: a) pick the new UP requests until the DOWN one, process them even higher than DOWN comes from and then finish DOWN request
+b) pick the new UP requests until the DOWN one, process them up to DOWN and then move down - BAD IDEA
+c) depending on where the DOWN request come from in relation to the elevator - higher or lower -
+    if higher c1) accept the new UP requests even up to DOWN floor and then behave as a)
+              c2) stop accepting the new UP requests, process existing UP requests (if any), pick up DOWN and then move down.
+    if lower  c3) the same as c2)
+
+    In this case, we can have two priority queues: one for all incoming requests prioritized by time,
+    another one for processing current UP/DOWN requests prioritized by floor.
+
+FURTHER OPTIMIZATION: decision is made based on distance between the elevator, existing requests and new request with reverse direction.
+
+3) Should we differentiate initial and destination requests and process them independently?
+
+YES.
+During moving UP/DOWN, the elevator will have internal queue where (for time complexity optimization)
+the requests are prioritized by the floor. Keep in mind, there can be several requests for the same floor (one poll() is not enough).
